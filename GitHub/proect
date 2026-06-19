@@ -1,0 +1,182 @@
+import tkinter as tk
+
+shape = "line"
+
+x1 = 0
+y1 = 0
+
+
+figures = []
+
+
+def line():
+    global shape
+    shape = "line"
+
+
+def rectangle():
+    global shape
+    shape = "rectangle"
+
+
+def oval():
+    global shape
+    shape = "oval"
+
+
+def start(event):
+    global x1, y1
+
+    x1 = event.x
+    y1 = event.y
+
+
+def finish(event):
+    global figures
+
+    x2 = event.x
+    y2 = event.y
+
+    color = color_entry.get()
+    width = int(width_entry.get())
+
+    if shape == "line":
+        canvas.create_line(
+            x1, y1, x2, y2,
+            fill=color,
+            width=width
+        )
+
+    elif shape == "rectangle":
+        canvas.create_rectangle(
+            x1, y1, x2, y2,
+            outline=color,
+            width=width
+        )
+
+    elif shape == "oval":
+        canvas.create_oval(
+            x1, y1, x2, y2,
+            outline=color,
+            width=width
+        )
+
+    figures.append(
+        shape + " "
+        + str(x1) + " "
+        + str(y1) + " "
+        + str(x2) + " "
+        + str(y2) + " "
+        + color + " "
+        + str(width)
+    )
+
+
+def save():
+    file = open("drawing.txt", "w")
+
+    for figure in figures:
+        file.write(figure + "\n")
+
+    file.close()
+
+
+def load():
+    canvas.delete("all")
+
+    file = open("drawing.txt", "r")
+
+    for row in file:
+
+        data = row.split()
+
+        figure_type = data[0]
+
+        x1 = int(data[1])
+        y1 = int(data[2])
+        x2 = int(data[3])
+        y2 = int(data[4])
+
+        color = data[5]
+        width = int(data[6])
+
+        if figure_type == "line":
+            canvas.create_line(
+                x1, y1, x2, y2,
+                fill=color,
+                width=width
+            )
+
+        elif figure_type == "rectangle":
+            canvas.create_rectangle(
+                x1, y1, x2, y2,
+                outline=color,
+                width=width
+            )
+
+        elif figure_type == "oval":
+            canvas.create_oval(
+                x1, y1, x2, y2,
+                outline=color,
+                width=width
+            )
+
+    file.close()
+
+
+root = tk.Tk()
+root.title("Графічний редактор")
+
+canvas = tk.Canvas(
+    root,
+    width=700,
+    height=500,
+    bg="white"
+)
+canvas.pack()
+
+frame = tk.Frame(root)
+frame.pack()
+
+tk.Button(frame,
+          text="Лінія",
+          command=line).pack(side="left")
+
+tk.Button(frame,
+          text="Прямокутник",
+          command=rectangle).pack(side="left")
+
+tk.Button(frame,
+          text="Еліпс",
+          command=oval).pack(side="left")
+
+tk.Button(frame,
+          text="Зберегти",
+          command=save).pack(side="left")
+
+tk.Button(frame,
+          text="Відкрити",
+          command=load).pack(side="left")
+
+tk.Label(frame,
+         text="Колір").pack(side="left")
+
+color_entry = tk.Entry(frame,
+                       width=10)
+
+color_entry.insert(0, "black")
+color_entry.pack(side="left")
+
+tk.Label(frame,
+         text="Товщина").pack(side="left")
+
+width_entry = tk.Entry(frame,
+                       width=5)
+
+width_entry.insert(0, "2")
+width_entry.pack(side="left")
+
+canvas.bind("<Button-1>", start)
+canvas.bind("<ButtonRelease-1>", finish)
+
+root.mainloop()
